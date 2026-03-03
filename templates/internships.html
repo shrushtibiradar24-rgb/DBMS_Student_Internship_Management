@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Internships</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container-fluid">
+        <span class="navbar-brand">Available Internships</span>
+        <a href="/user_dashboard" class="btn btn-light btn-sm">Back</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Filter Buttons -->
+    <div class="mb-3">
+        <a href="/internships?status=Ongoing" class="btn btn-success btn-sm">Ongoing</a>
+        <a href="/internships?status=Completed" class="btn btn-secondary btn-sm">Completed</a>
+        <a href="/internships" class="btn btn-dark btn-sm">All</a>
+    </div>
+
+    <table class="table table-bordered table-hover shadow">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Stipend</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for i in internships %}
+            <tr>
+                <td>{{ i[0] }}</td>
+                <td>{{ i[1] }}</td>
+                <td>{{ i[2] }}</td>
+                <td>{{ i[3] }}</td>
+                <td>
+                    {% if i[4] == "Ongoing" %}
+                        <span class="badge bg-success">Ongoing</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Completed</span>
+                    {% endif %}
+                </td>
+                <td>{{ i[5] }}</td>
+                <td>{{ i[6] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+<table class="table table-bordered">
+<tr>
+    <th>ID</th>
+    <th>Student</th>
+    <th>Company</th>
+    <th>Role</th>
+    <th>Status</th>
+    <th>Actions</th>
+</tr>
+
+{% for i in internships %}
+<tr>
+    <td>{{ i[0] }}</td>
+    <td>{{ i[1] }}</td>
+    <td>{{ i[2] }}</td>
+    <td>{{ i[3] }}</td>
+    <td>{{ i[4] }}</td>
+    <td>
+        <a href="/edit_internship/{{ i[0] }}" class="btn btn-sm btn-primary">Edit</a>
+        <a href="/delete_internship/{{ i[0] }}" class="btn btn-sm btn-danger">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
