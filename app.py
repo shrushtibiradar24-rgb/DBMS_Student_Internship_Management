@@ -22,6 +22,7 @@ def get_db_connection():
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+
         email = request.form['email']
         password = request.form['password']
 
@@ -32,7 +33,9 @@ def login():
             "SELECT * FROM user WHERE email=%s AND password=%s",
             (email, password)
         )
+
         user = cursor.fetchone()
+
         cursor.close()
         db.close()
 
@@ -50,11 +53,13 @@ def login():
     return render_template("login.html")
 
 # -------------------------
-# REGISTER (Viewer only)
+# REGISTER
 # -------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
     if request.method == 'POST':
+
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
@@ -63,80 +68,109 @@ def register():
         cursor = db.cursor()
 
         cursor.execute("""
-            INSERT INTO user (name, email, password, role)
-            VALUES (%s, %s, %s, %s)
-        """, (name, email, password, "viewer"))
+        INSERT INTO user (name,email,password,role)
+        VALUES (%s,%s,%s,%s)
+        """,(name,email,password,"viewer"))
 
         db.commit()
+
         cursor.close()
         db.close()
 
-        flash("Account created successfully!", "success")
+        flash("Account created successfully!")
         return redirect(url_for('login'))
 
-    return render_template('register.html')
+    return render_template("register.html")
 
 # -------------------------
 # ADMIN DASHBOARD
 # -------------------------
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if 'role' not in session or session['role'] != 'admin':
+
+    if 'role' not in session or session['role']!='admin':
         return redirect(url_for('login'))
 
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
 
-    # Fetch Students
     cursor.execute("SELECT * FROM student")
     students = cursor.fetchall()
 
-    # Fetch Internships
     cursor.execute("SELECT * FROM internship")
     internships = cursor.fetchall()
 
-    # Fetch Departments
     cursor.execute("SELECT * FROM department")
     departments = cursor.fetchall()
 
-    # Fetch Combined Data
     cursor.execute("""
-        SELECT 
-            a.application_id,
-            i.title AS internship_title,
-            i.company_name,
-            i.duration,
-            i.stipend,
-            s.name AS student_name,
-            s.email AS student_email,
-            s.phone AS student_phone,
-            a.status AS application_status,
-            a.apply_date
-        FROM application a
-        JOIN student s ON a.student_id = s.student_id
-        JOIN internship i ON a.internship_id = i.internship_id
-        ORDER BY a.application_id DESC
+    SELECT 
+        a.application_id,
+        i.title AS internship_title,
+        i.company_name,
+        i.duration,
+        i.stipend,
+        s.name AS student_name,
+        s.email AS student_email,
+        s.phone AS student_phone,
+        a.status AS application_status,
+        a.apply_date
+    FROM application a
+    JOIN student s ON a.student_id=s.student_id
+    JOIN internship i ON a.internship_id=i.internship_id
+    ORDER BY a.application_id DESC
     """)
+
     data = cursor.fetchall()
 
     cursor.close()
     db.close()
 
     return render_template(
-        'admin_dashboard.html',
+        "admin_dashboard.html",
         students=students,
         internships=internships,
         departments=departments,
-        data=data
+        data=data,
+        total_students=len(students),
+        total_internships=len(internships),
+        total_departments=len(departments),
+        total_applications=len(data)
     )
 
 # -------------------------
-# ADD STUDENT
+# OPEN ADD STUDENT PAGE
+# -------------------------
+@app.route('/add_student_page')
+def add_student_page():
+
+    if session.get('role')!='admin':
+        return redirect(url_for('login'))
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM department")
+    departments = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return render_template("add_student.html", departments=departments)
+
+# -------------------------
+# ADD STUDENT TO DATABASE
 # -------------------------
 @app.route('/add_student', methods=['POST'])
 def add_student():
+
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
+
+    name = request.form['name']
+    email = request.form['email']
+    phone = request.form['phone']
+    dept_id = request.form['dept_id']
 
     db = get_db_connection()
     cursor = db.cursor()
@@ -144,18 +178,13 @@ def add_student():
     cursor.execute("""
         INSERT INTO student (name, email, phone, dept_id)
         VALUES (%s, %s, %s, %s)
-    """, (
-        request.form['name'],
-        request.form['email'],
-        request.form['phone'],
-        request.form['dept_id']
-    ))
+    """, (name, email, phone, dept_id))
 
     db.commit()
+
     cursor.close()
     db.close()
 
-    flash("Student added successfully!", "success")
     return redirect(url_for('admin_dashboard'))
 
 # -------------------------
@@ -163,88 +192,138 @@ def add_student():
 # -------------------------
 @app.route('/add_internship', methods=['POST'])
 def add_internship():
+
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
+
+    title = request.form['title']
+    company_name = request.form['company_name']
+    duration = request.form['duration']
+    stipend = request.form['stipend']
+    dept_id = request.form['dept_id']
+
+    user_id = session['user_id']   # logged-in admin
 
     db = get_db_connection()
     cursor = db.cursor()
 
     cursor.execute("""
-        INSERT INTO internship (title, company_name, duration, stipend, dept_id)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (
-        request.form['title'],
-        request.form['company_name'],
-        request.form['duration'],
-        request.form['stipend'],
-        request.form['dept_id']
-    ))
+        INSERT INTO internship
+        (title, company_name, duration, stipend, dept_id, user_id)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """,(title, company_name, duration, stipend, dept_id, user_id))
 
     db.commit()
+
     cursor.close()
     db.close()
 
-    flash("Internship added successfully!", "success")
     return redirect(url_for('admin_dashboard'))
 
+
 # -------------------------
-# ADD APPLICATION (COMBINED)
+# OPEN ASSIGN INTERNSHIP PAGE
 # -------------------------
-@app.route('/add_application', methods=['POST'])
-def add_application():
-    if session.get('role') != 'admin':
+@app.route('/assign_internship_page')
+def assign_internship_page():
+
+    if session.get('role')!='admin':
         return redirect(url_for('login'))
 
     db = get_db_connection()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
 
-    try:
-        # Insert Student
-        cursor.execute("""
-            INSERT INTO student (name, email, phone, dept_id)
-            VALUES (%s, %s, %s, %s)
-        """, (
-            request.form['student_name'],
-            request.form['student_email'],
-            request.form['student_phone'],
-            request.form['student_dept_id']
-        ))
-        student_id = cursor.lastrowid
+    cursor.execute("SELECT * FROM student")
+    students = cursor.fetchall()
 
-        # Insert Internship
-        cursor.execute("""
-            INSERT INTO internship (title, company_name, duration, stipend, dept_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (
-            request.form['title'],
-            request.form['company_name'],
-            request.form['duration'],
-            request.form['stipend'],
-            request.form['internship_dept_id']
-        ))
-        internship_id = cursor.lastrowid
-
-        # Insert Application
-        cursor.execute("""
-            INSERT INTO application (student_id, internship_id, status, apply_date)
-            VALUES (%s, %s, %s, %s)
-        """, (
-            student_id,
-            internship_id,
-            request.form['status'],
-            request.form['apply_date'] or str(date.today())
-        ))
-
-        db.commit()
-
-    except Exception as e:
-        db.rollback()
-        print("Error:", e)
+    cursor.execute("SELECT * FROM internship")
+    internships = cursor.fetchall()
 
     cursor.close()
     db.close()
 
-    flash("Internship assigned successfully!", "success")
+    return render_template(
+        "assign_internship.html",
+        students=students,
+        internships=internships
+    )
+
+# -------------------------
+# ADD APPLICATION
+# -------------------------
+@app.route('/add_application',methods=['POST'])
+def add_application():
+
+    if session.get('role')!='admin':
+        return redirect(url_for('login'))
+
+    db=get_db_connection()
+    cursor=db.cursor()
+
+    cursor.execute("""
+    INSERT INTO application(student_id,internship_id,status,apply_date)
+    VALUES(%s,%s,%s,%s)
+    """,(
+        request.form['student_id'],
+        request.form['internship_id'],
+        request.form['status'],
+        request.form['apply_date'] or str(date.today())
+    ))
+
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    flash("Application added successfully")
+    return redirect(url_for('admin_dashboard'))
+
+# -------------------------
+# EDIT APPLICATION
+# -------------------------
+@app.route('/edit_application/<int:id>')
+def edit_application(id):
+
+    if session.get('role')!='admin':
+        return redirect(url_for('login'))
+
+    db=get_db_connection()
+    cursor=db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM application WHERE application_id=%s",(id,))
+    application=cursor.fetchone()
+
+    cursor.close()
+    db.close()
+
+    return render_template("edit_application.html",application=application)
+
+# -------------------------
+# UPDATE APPLICATION
+# -------------------------
+@app.route('/update_application/<int:id>',methods=['POST'])
+def update_application(id):
+
+    if session.get('role')!='admin':
+        return redirect(url_for('login'))
+
+    status=request.form['status']
+
+    db=get_db_connection()
+    cursor=db.cursor()
+
+    cursor.execute("""
+    UPDATE application
+    SET status=%s
+    WHERE application_id=%s
+    """,(status,id))
+
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    flash("Application updated successfully")
     return redirect(url_for('admin_dashboard'))
 
 # -------------------------
@@ -252,17 +331,20 @@ def add_application():
 # -------------------------
 @app.route('/delete_application/<int:id>')
 def delete_application(id):
-    if session.get('role') != 'admin':
+
+    if session.get('role')!='admin':
         return redirect(url_for('login'))
 
-    db = get_db_connection()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM application WHERE application_id=%s", (id,))
+    db=get_db_connection()
+    cursor=db.cursor()
+
+    cursor.execute("DELETE FROM application WHERE application_id=%s",(id,))
     db.commit()
+
     cursor.close()
     db.close()
 
-    flash("Application deleted!", "success")
+    flash("Application deleted successfully")
     return redirect(url_for('admin_dashboard'))
 
 # -------------------------
@@ -270,42 +352,45 @@ def delete_application(id):
 # -------------------------
 @app.route('/user_dashboard')
 def user_dashboard():
+
     if 'role' not in session:
         return redirect(url_for('login'))
 
-    db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
+    db=get_db_connection()
+    cursor=db.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT 
-            i.title AS internship_title,
-            i.company_name,
-            i.duration,
-            i.stipend,
-            s.name AS student_name,
-            a.status,
-            a.apply_date
-        FROM application a
-        JOIN student s ON a.student_id = s.student_id
-        JOIN internship i ON a.internship_id = i.internship_id
+    SELECT
+        i.title AS internship_title,
+        i.company_name,
+        i.duration,
+        i.stipend,
+        s.name AS student_name,
+        a.status,
+        a.apply_date
+    FROM application a
+    JOIN student s ON a.student_id=s.student_id
+    JOIN internship i ON a.internship_id=i.internship_id
     """)
 
-    data = cursor.fetchall()
+    data=cursor.fetchall()
+
     cursor.close()
     db.close()
 
-    return render_template("user_dashboard.html", data=data)
+    return render_template("user_dashboard.html",data=data)
 
 # -------------------------
 # LOGOUT
 # -------------------------
 @app.route('/logout')
 def logout():
+
     session.clear()
     return redirect(url_for('login'))
 
 # -------------------------
-# RUN APP
+# RUN
 # -------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

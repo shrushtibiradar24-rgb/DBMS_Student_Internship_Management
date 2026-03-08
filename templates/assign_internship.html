@@ -1,40 +1,121 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Assign Internship</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+```
+<style>
+    body{
+        font-family: Arial;
+        background:#f4f6f9;
+    }
+
+    .container{
+        width:500px;
+        margin:auto;
+        background:white;
+        padding:25px;
+        margin-top:40px;
+        border-radius:8px;
+        box-shadow:0px 0px 10px rgba(0,0,0,0.1);
+    }
+
+    h2{
+        text-align:center;
+    }
+
+    h3{
+        margin-top:20px;
+    }
+
+    input, select{
+        width:100%;
+        padding:10px;
+        margin-top:8px;
+        margin-bottom:10px;
+        border:1px solid #ccc;
+        border-radius:5px;
+    }
+
+    button{
+        width:100%;
+        padding:12px;
+        background:#007bff;
+        color:white;
+        border:none;
+        border-radius:5px;
+        font-size:16px;
+        cursor:pointer;
+    }
+
+    button:hover{
+        background:#0056b3;
+    }
+
+    .back-btn{
+        display:block;
+        text-align:center;
+        margin-top:15px;
+    }
+</style>
+```
+
 </head>
+
 <body>
 
 <div class="container">
-    <h2>Assign Internship</h2>
 
-    <form method="POST" action="/assign_internship">
+```
+<h2>Assign Internship</h2>
 
-        <h3>Student Details</h3>
-        <input type="text" name="name" placeholder="Student Name" required>
-        <input type="email" name="email" placeholder="Student Email" required>
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <input type="number" name="dept_id" placeholder="Department ID" required>
+<form method="POST" action="/assign_internship">
 
-        <h3>Internship Details</h3>
-        <input type="text" name="title" placeholder="Internship Title" required>
-        <input type="text" name="company" placeholder="Company Name" required>
-        <input type="text" name="duration" placeholder="Duration (e.g., 3 Months)" required>
-        <input type="number" name="stipend" placeholder="Stipend" required>
+    <h3>Student Details</h3>
 
-        <h3>Application Details</h3>
-        <select name="status">
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-        </select>
+    <input type="text" name="name" placeholder="Student Name" required>
 
-        <input type="date" name="apply_date" required>
+    <input type="email" name="email" placeholder="Student Email" required>
 
-        <button type="submit">Assign Internship</button>
+    <input type="text" name="phone" placeholder="Phone Number" required>
 
-    </form>
+    <input type="number" name="dept_id" placeholder="Department ID" required>
+
+
+    <h3>Internship Details</h3>
+
+    <input type="text" name="title" placeholder="Internship Title" required>
+
+    <input type="text" name="company_name" placeholder="Company Name" required>
+
+    <input type="text" name="duration" placeholder="Duration (Example: 3 Months)" required>
+
+    <input type="number" name="stipend" placeholder="Stipend" required>
+
+
+    <h3>Application Details</h3>
+
+    <select name="status">
+        <option value="Pending">Pending</option>
+        <option value="Selected">Selected</option>
+        <option value="Rejected">Rejected</option>
+    </select>
+
+    <input type="date" name="apply_date" required>
+
+
+    <!-- SUBMIT BUTTON -->
+    <button type="submit">Assign Internship</button>
+
+</form>
+
+<div class="back-btn">
+    <a href="{{ url_for('admin_dashboard') }}">⬅ Back to Dashboard</a>
+</div>
+```
+
 </div>
 
 </body>

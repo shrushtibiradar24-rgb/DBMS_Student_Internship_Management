@@ -1,238 +1,282 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+  <head>
     <title>Admin Dashboard</title>
 
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
 
     <style>
-        body {
-            background-color: #f4f6f9;
-        }
-        .card-hover:hover {
-            transform: scale(1.03);
-            transition: 0.3s;
-        }
-        .table thead {
-            background-color: #0d6efd;
-            color: white;
-        }
-        table th, table td {
-            vertical-align: middle;
-        }
+      body {
+        background-color: #f4f6f9;
+      }
+      .card-hover:hover {
+        transform: scale(1.03);
+        transition: 0.3s;
+      }
+      .table thead {
+        background-color: #0d6efd;
+        color: white;
+      }
+      table th,
+      table td {
+        vertical-align: middle;
+      }
     </style>
-</head>
-<body>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-dark bg-primary px-4">
-    <span class="navbar-brand mb-0 h1">
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark bg-primary px-4">
+      <span class="navbar-brand mb-0 h1">
         <i class="bi bi-speedometer2"></i> Admin Dashboard
-    </span>
-    <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">
+      </span>
+      <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">
         <i class="bi bi-box-arrow-right"></i> Logout
-    </a>
-</nav>
+      </a>
+    </nav>
 
-<div class="container mt-4">
-
-    <!-- STAT CARDS -->
-    <div class="row mb-4">
+    <div class="container mt-4">
+      <!-- STAT CARDS -->
+      <div class="row mb-4">
         <div class="col-md-6">
-            <div class="card text-white bg-success shadow card-hover">
-                <div class="card-body">
-                    <h5><i class="bi bi-people-fill"></i> Total Students</h5>
-                    <h2>{{ students|length }}</h2>
-                </div>
+          <div class="card text-white bg-success shadow card-hover">
+            <div class="card-body">
+              <h5><i class="bi bi-people-fill"></i> Total Students</h5>
+              <h2>{{ data|length }}</h2>
             </div>
+          </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card text-white bg-info shadow card-hover">
-                <div class="card-body">
-                    <h5><i class="bi bi-briefcase-fill"></i> Total Internships</h5>
-                    <h2>{{ internships|length }}</h2>
-                </div>
+          <div class="card text-white bg-info shadow card-hover">
+            <div class="card-body">
+              <h5><i class="bi bi-briefcase-fill"></i> Total Internships</h5>
+              <h2>{{ internships|length }}</h2>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- ACTION BUTTONS -->
-    <div class="mb-3">
-        <button class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-            <i class="bi bi-person-plus"></i> Add Student
+      <!-- ACTION BUTTONS -->
+      <div class="mb-3">
+        <button
+          class="btn btn-primary me-2"
+          data-bs-toggle="modal"
+          data-bs-target="#addStudentModal"
+        >
+          <i class="bi bi-person-plus"></i> Add Student
         </button>
 
-        <button class="btn btn-info mb-2" data-bs-toggle="modal" data-bs-target="#addInternshipModal">
-            <i class="bi bi-briefcase-plus"></i> Add Internship
+        <button
+          class="btn btn-success me-2"
+          data-bs-toggle="modal"
+          data-bs-target="#addInternshipModal"
+        >
+          <i class="bi bi-briefcase"></i> Add Internship
         </button>
 
-        <button class="btn btn-warning mb-2" data-bs-toggle="modal" data-bs-target="#assignModal">
-            <i class="bi bi-card-checklist"></i> Assign Internship
+        <button
+          class="btn btn-warning"
+          data-bs-toggle="modal"
+          data-bs-target="#assignModal"
+        >
+          <i class="bi bi-card-checklist"></i> Assign Internship
         </button>
-    </div>
+      </div>
 
-    <!-- MAIN TABLE -->
-    <div class="card shadow">
+      <!-- MAIN TABLE -->
+      <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h5><i class="bi bi-list-ul"></i> Student & Internship Details</h5>
+          <h5><i class="bi bi-list-ul"></i> Student & Internship Details</h5>
         </div>
 
         <div class="card-body table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>Internship</th>
-                        <th>Company</th>
-                        <th>Duration</th>
-                        <th>Stipend</th>
-                        <th>Student</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Apply Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in data %}
-                    <tr>
-                        <td>{{ row.internship_title }}</td>
-                        <td>{{ row.company_name }}</td>
-                        <td>{{ row.duration }}</td>
-                        <td>{{ row.stipend }}</td>
-                        <td>{{ row.student_name }}</td>
-                        <td>{{ row.student_email }}</td>
-                        <td>{{ row.student_phone }}</td>
-                        <td>{{ row.application_status }}</td>
-                        <td>{{ row.apply_date }}</td>
-                        <td>
-                            <a href="{{ url_for('delete_application', id=row.application_id) }}"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Are you sure?')">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>Internship</th>
+                <th>Company</th>
+                <th>Duration</th>
+                <th>Stipend</th>
+                <th>Student</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Apply Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for row in data %}
+
+              <tr>
+                <td>{{ row.internship_title }}</td>
+                <td>{{ row.company_name }}</td>
+                <td>{{ row.duration }}</td>
+                <td>{{ row.stipend }}</td>
+                <td>{{ row.student_name }}</td>
+                <td>{{ row.student_email }}</td>
+                <td>{{ row.student_phone }}</td>
+                <td>{{ row.application_status }}</td>
+                <td>{{ row.apply_date }}</td>
+
+                <td>
+                  <!-- EDIT BUTTON -->
+                  <a
+                    href="{{ url_for('edit_application', id=row.application_id) }}"
+                    class="btn btn-warning btn-sm"
+                  >
+                    <i class="bi bi-pencil"></i>Edit
+                  </a>
+
+                  <!-- DELETE BUTTON -->
+                  <a
+                    href="{{ url_for('delete_application', id=row.application_id) }}"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure?');"
+                  >
+                    <i class="bi bi-trash"></i>Delete
+                  </a>
+                </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- ================= MODALS ================= -->
+    <!-- ================= MODALS ================= -->
 
-<!-- ADD STUDENT MODAL -->
-<div class="modal fade" id="addStudentModal">
-  <div class="modal-dialog">
-    <form action="{{ url_for('add_student') }}" method="POST">
-      <div class="modal-content">
-        <div class="modal-header bg-success text-white">
-          <h5>Add Student</h5>
-          <button type="button" class="btn-close bg-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <input type="text" name="name" class="form-control mb-2" placeholder="Name" required>
-          <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
-          <input type="text" name="phone" class="form-control mb-2" placeholder="Phone" required>
-          <select name="dept_id" class="form-select" required>
-            {% for dept in departments %}
-              <option value="{{ dept.dept_id }}">{{ dept.dept_name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Save</button>
-        </div>
+    <!-- ADD STUDENT MODAL -->
+    <div class="modal fade" id="addStudentModal">
+      <div class="modal-dialog">
+        <form action="{{ url_for('add_student') }}" method="POST">
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <h5>Add Student</h5>
+              <button
+                type="button"
+                class="btn-close bg-white"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div class="modal-body">
+              <input
+                type="text"
+                name="name"
+                class="form-control mb-2"
+                placeholder="Name"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                class="form-control mb-2"
+                placeholder="Email"
+                required
+              />
+              <input
+                type="text"
+                name="phone"
+                class="form-control mb-2"
+                placeholder="Phone"
+                required
+              />
+
+              <select name="dept_id" class="form-select" required>
+                {% for dept in departments %}
+                <option value="{{ dept.dept_id }}">{{ dept.dept_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Save</button>
+            </div>
+          </div>
+        </form>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
 
-<!-- ADD INTERNSHIP MODAL -->
-<div class="modal fade" id="addInternshipModal">
-  <div class="modal-dialog">
-    <form action="{{ url_for('add_internship') }}" method="POST">
-      <div class="modal-content">
-        <div class="modal-header bg-info text-white">
-          <h5>Add Internship</h5>
-          <button type="button" class="btn-close bg-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <input type="text" name="title" class="form-control mb-2" placeholder="Title" required>
-          <input type="text" name="company_name" class="form-control mb-2" placeholder="Company Name" required>
-          <input type="text" name="duration" class="form-control mb-2" placeholder="Duration" required>
-          <input type="text" name="stipend" class="form-control mb-2" placeholder="Stipend" required>
-          <select name="dept_id" class="form-select" required>
-            {% for dept in departments %}
-              <option value="{{ dept.dept_id }}">{{ dept.dept_name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-info">Save</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
+   <!-- ASSIGN INTERNSHIP MODAL -->
 
-<!-- ASSIGN INTERNSHIP MODAL (COMBINED) -->
+<!-- ASSIGN INTERNSHIP MODAL -->
+
 <div class="modal fade" id="assignModal">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <form action="{{ url_for('add_application') }}" method="POST">
-      <div class="modal-content">
-        <div class="modal-header bg-warning">
-          <h5>Assign Internship</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
 
-        <div class="modal-body">
+```
+  <div class="modal-content">
 
-          <h6 class="text-primary">Student Details</h6>
-          <input type="text" name="student_name" class="form-control mb-2" placeholder="Student Name" required>
-          <input type="email" name="student_email" class="form-control mb-2" placeholder="Student Email" required>
-          <input type="text" name="student_phone" class="form-control mb-2" placeholder="Phone" required>
-          <select name="student_dept_id" class="form-select mb-3" required>
-            {% for dept in departments %}
-              <option value="{{ dept.dept_id }}">{{ dept.dept_name }}</option>
-            {% endfor %}
-          </select>
+    <div class="modal-header bg-warning">
+      <h5>Assign Internship</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
 
-          <h6 class="text-success">Internship Details</h6>
-          <input type="text" name="title" class="form-control mb-2" placeholder="Internship Title" required>
-          <input type="text" name="company_name" class="form-control mb-2" placeholder="Company Name" required>
-          <input type="text" name="duration" class="form-control mb-2" placeholder="Duration" required>
-          <input type="text" name="stipend" class="form-control mb-2" placeholder="Stipend" required>
-          <select name="internship_dept_id" class="form-select mb-3" required>
-            {% for dept in departments %}
-              <option value="{{ dept.dept_id }}">{{ dept.dept_name }}</option>
-            {% endfor %}
-          </select>
+    <div class="modal-body">
 
-          <h6 class="text-danger">Application Details</h6>
-          <select name="status" class="form-select mb-2" required>
-              <option value="Applied">Applied</option>
-              <option value="Selected">Selected</option>
-              <option value="Rejected">Rejected</option>
-          </select>
+      <!-- STUDENT -->
+      <label>Select Student</label>
+      <select name="student_id" class="form-select mb-3" required>
+        {% for s in students %}
+        <option value="{{ s.student_id }}">
+          {{ s.name }} ({{ s.email }})
+        </option>
+        {% endfor %}
+      </select>
 
-          <input type="date" name="apply_date" class="form-control" required>
+      <!-- INTERNSHIP -->
+      <label>Select Internship</label>
+      <select name="internship_id" class="form-select mb-3" required>
+        {% for i in internships %}
+        <option value="{{ i.internship_id }}">
+          {{ i.title }} - {{ i.company_name }}
+        </option>
+        {% endfor %}
+      </select>
 
-        </div>
+      <!-- STATUS -->
+      <label>Status</label>
+      <select name="status" class="form-select mb-3">
+        <option value="Applied">Applied</option>
+        <option value="Selected">Selected</option>
+        <option value="Rejected">Rejected</option>
+      </select>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-warning">Assign Internship</button>
-        </div>
+      <!-- APPLY DATE -->
+      <label>Apply Date</label>
+      <input type="date" name="apply_date" class="form-control">
 
-      </div>
-    </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-warning">
+        Assign Internship
+      </button>
+    </div>
+
+  </div>
+
+</form>
+```
+
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
