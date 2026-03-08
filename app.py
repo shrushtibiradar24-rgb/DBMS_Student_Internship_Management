@@ -308,15 +308,16 @@ def update_application(id):
         return redirect(url_for('login'))
 
     status=request.form['status']
+    apply_date = request.form['apply_date'] or str(date.today())
 
     db=get_db_connection()
     cursor=db.cursor()
 
     cursor.execute("""
     UPDATE application
-    SET status=%s
+    SET status=%s, apply_date=%s
     WHERE application_id=%s
-    """,(status,id))
+    """,(status, apply_date, id))
 
     db.commit()
 
